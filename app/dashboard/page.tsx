@@ -155,16 +155,19 @@ export default async function Dashboard({
   let apiError: string | null = null;
 
   try {
-    const mediaRes = await fetch(
-      `${GRAPH_BASE}/${activeAccount.ig_user_id}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=24&access_token=${decryptedToken}`,
-      { cache: 'no-store' }
-    );
-    const mediaData = await mediaRes.json();
+    // Follow Graph API paging so every post/reel shows (capped at 500).
+    let nextUrl: string | null =
+      `${GRAPH_BASE}/${activeAccount.ig_user_id}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=100&access_token=${decryptedToken}`;
+    while (nextUrl && media.length < 500) {
+      const mediaRes: Response = await fetch(nextUrl, { cache: 'no-store' });
+      const mediaData = await mediaRes.json();
 
-    if (mediaData.error) {
-      apiError = `Instagram API Error: ${mediaData.error.message}`;
-    } else {
-      media = mediaData.data || [];
+      if (mediaData.error) {
+        apiError = `Instagram API Error: ${mediaData.error.message}`;
+        break;
+      }
+      media = media.concat(mediaData.data || []);
+      nextUrl = mediaData.paging?.next || null;
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
