@@ -181,16 +181,15 @@ export default async function SettingsPage({
           <section className="overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
             <header className="border-b border-neutral-200/80 p-5 dark:border-neutral-800">
               <h2 className="text-base font-semibold text-neutral-900 dark:text-white">
-                About & community
+                About
               </h2>
               <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
-                AutoDMX is built and maintained by Qaxlabs.
+                Billionaire Sabari · DM automation
               </p>
             </header>
             <div className="space-y-4 p-5">
               <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-                Follow for tutorials, behind-the-scenes updates, and to get
-                notified when new features ship.
+                Follow the journey on Instagram.
               </p>
               <SocialLinks />
               <div className="flex flex-wrap gap-2.5 pt-2">

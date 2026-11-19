@@ -77,7 +77,7 @@ export default function LoginPage({
         </div>
 
         <p className="mt-6 text-center text-[11px] text-neutral-400 dark:text-neutral-500">
-          Self-hosted by Qaxlabs ·{" "}
+          Billionaire Sabari ·{" "}
           <Link href="/privacy" className="hover:text-neutral-900 dark:hover:text-neutral-300">
             Privacy
           </Link>{" "}

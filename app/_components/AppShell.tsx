@@ -195,15 +195,7 @@ export function AppShell({
           <div className="border-t border-black/[0.06] dark:border-white/[0.08]">
             <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-6 text-xs text-neutral-500 sm:flex-row sm:px-8">
               <p>
-                © {new Date().getFullYear()} AutoDMX · Crafted by{" "}
-                <a
-                  href="https://github.com/Qaxlabs"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-neutral-700 hover:text-black dark:text-neutral-300 dark:hover:text-white transition-colors"
-                >
-                  Qaxlabs
-                </a>
+                © {new Date().getFullYear()} Billionaire Sabari
               </p>
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <Link

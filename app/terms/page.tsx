@@ -1,6 +1,5 @@
 import { ContactEmail, BackToHome } from '../_components/ContactEmail';
 import { AppShell } from '../_components/AppShell';
-import Link from 'next/link';
 
 export default function TermsPage() {
   return (
@@ -73,16 +72,7 @@ export default function TermsPage() {
             <div className="h-px bg-neutral-200/70 dark:bg-neutral-800" />
 
             <p className="text-xs text-neutral-500">
-              This is an open-source project. Source code is available on GitHub
-              at:{' '}
-              <Link
-                href="https://github.com/Qaxlabs/AutoDMX"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-neutral-900 underline dark:text-white hover:opacity-80"
-              >
-                github.com/Qaxlabs/AutoDMX
-              </Link>
+              Built on the open-source AutoDMX project (MIT licence).
             </p>
           </div>
         </article>

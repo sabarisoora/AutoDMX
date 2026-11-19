@@ -14,68 +14,31 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-const SITE_URL = "https://autodmx.netlify.app";
-const OG_IMAGE = "/og-image.png";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://billionaire-sabari-dm.netlify.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "AutoDMX — Self-Hosted ManyChat Alternative for Instagram",
-    template: "%s · AutoDMX",
+    default: "Billionaire Sabari",
+    template: "%s · Billionaire Sabari",
   },
   description:
-    "Self-hosted, open-source ManyChat alternative for Instagram comment-to-DM automation. Capture leads, deliver links, and grow sales with 100% data ownership. Built by Qaxlabs.",
-  keywords: [
-    "self-hosted ManyChat alternative",
-    "open-source ManyChat alternative",
-    "ManyChat alternative",
-    "Instagram ManyChat alternative",
-    "Instagram automation",
-    "Instagram DM bot",
-    "comment to DM",
-    "comment-to-DM",
-    "Instagram comment automation",
-    "lead generation",
-    "Instagram marketing tool",
-    "Instagram auto reply",
-    "open source",
-    "self-hosted",
-    "Next.js",
-    "Supabase",
-    "Meta Graph API",
-    "AutoDMX",
-    "Qaxlabs",
-  ],
-  authors: [{ name: "Qaxlabs", url: "https://github.com/Qaxlabs" }],
-  creator: "Qaxlabs",
-  publisher: "Qaxlabs",
-  applicationName: "AutoDMX",
-  category: "Developer Tools",
+    "Billionaire Sabari: documenting the road from zero to a billion. Digital marketing, AI automation and building in public.",
+  applicationName: "Billionaire Sabari",
   alternates: { canonical: "/" },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large" },
-  },
   openGraph: {
     type: "website",
-    locale: "en_US",
     url: SITE_URL,
-    siteName: "AutoDMX",
-    title: "AutoDMX — Self-Hosted ManyChat Alternative for Instagram",
-    description:
-      "Self-hosted, open-source ManyChat alternative for Instagram comment-to-DM automation. Capture leads, deliver links, and grow sales with complete data ownership.",
-    images: [
-      { url: OG_IMAGE, width: 1200, height: 630, alt: "AutoDMX — Self-Hosted ManyChat Alternative" },
-    ],
+    siteName: "Billionaire Sabari",
+    title: "Billionaire Sabari",
+    description: "Documenting the road from zero to a billion, one post at a time.",
+    images: [{ url: "/sabari.webp", width: 720, height: 720, alt: "Billionaire Sabari" }],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "AutoDMX — Self-Hosted ManyChat Alternative for Instagram",
-    description:
-      "Self-hosted, open-source ManyChat alternative for Instagram comment-to-DM automation. Capture leads and grow sales with 100% data ownership.",
-    images: [OG_IMAGE],
-    creator: "@qaxlabs",
+    card: "summary",
+    title: "Billionaire Sabari",
+    description: "Documenting the road from zero to a billion, one post at a time.",
+    images: ["/sabari.webp"],
   },
 };
 

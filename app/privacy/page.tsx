@@ -24,7 +24,7 @@ export default function PrivacyPage() {
 
           <div className="mt-8 space-y-7 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
             <p>
-              AutoDMX is an open-source, self-hosted Instagram automation tool.
+              Billionaire Sabari uses a private, self-hosted Instagram automation tool.
               This deployment is operated by{' '}
               <ContactEmail variant="strong" /> for use with a single connected
               Instagram account.

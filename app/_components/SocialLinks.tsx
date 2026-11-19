@@ -8,8 +8,8 @@ import { AutoDMXLogo } from "./AutoDMXLogo";
 export const SOCIALS = {
   instagram: {
     label: "Instagram",
-    handle: "@qaxlabs",
-    href: "https://instagram.com/qaxlabs",
+    handle: "@billionaire_sabari",
+    href: "https://www.instagram.com/billionaire_sabari",
   },
   youtube: {
     label: "YouTube",
@@ -163,7 +163,7 @@ export type SocialLinksProps = {
  * Renders a row of clickable social icons.
  */
 export function SocialLinks({
-  networks = ["instagram", "youtube", "x", "github"],
+  networks = ["instagram"],
   variant = "icon-only",
   className = "",
   itemClassName = "",

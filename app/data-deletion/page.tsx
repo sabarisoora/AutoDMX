@@ -24,7 +24,7 @@ export default function DataDeletionPage() {
 
           <div className="mt-8 space-y-7 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
             <p>
-              To request deletion of any personal data AutoDMX has collected or
+              To request deletion of any personal data this service has collected or
               processed about you (including comments, direct messages,
               Instagram profile details, or your captured email address),
               please follow these instructions:
@@ -43,7 +43,7 @@ export default function DataDeletionPage() {
                 <li>
                   Use the subject line:{' '}
                   <span className="select-all rounded-md border border-neutral-200 bg-neutral-100 px-2 py-0.5 font-mono text-xs text-neutral-900 dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-200">
-                    AutoDMX Data Deletion Request
+                    Data Deletion Request
                   </span>
                 </li>
                 <li>
