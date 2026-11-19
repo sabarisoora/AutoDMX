@@ -114,7 +114,7 @@ async function checkFollowStatus(
   accessToken: string,
   contactId: string,
   automationId: string
-): Promise<boolean> {
+): Promise<'yes' | 'no' | 'unknown'> {
   try {
     console.log(`[Meta API] Checking follow status for IGSID: ${senderId}`);
     const profileRes = await fetchWithBackoff(
@@ -129,10 +129,11 @@ async function checkFollowStatus(
         contact_id: contactId,
         automation_id: automationId,
         direction: 'out',
-        content: `Follow check passed (failed open on error: ${profileData.error.message})`,
-        status: 'follow_passed',
+        content: `Follow status unknown: ${profileData.error.message}`,
+        status: 'follow_unknown',
       });
-      return true; // Fail open
+      // #230 = the person has not interacted with our DMs yet, so Instagram hides follow status.
+      return 'unknown';
     }
 
     const followsBusiness = profileData.is_user_follow_business ?? profileData.follows_business;
@@ -144,10 +145,10 @@ async function checkFollowStatus(
         contact_id: contactId,
         automation_id: automationId,
         direction: 'out',
-        content: 'Follow check passed (failed open due to missing field)',
-        status: 'follow_passed',
+        content: 'Follow status unknown (field missing)',
+        status: 'follow_unknown',
       });
-      return true; // Fail open
+      return 'unknown';
     }
 
     const isFollowing = !!followsBusiness;
@@ -158,7 +159,7 @@ async function checkFollowStatus(
       content: isFollowing ? 'Follow check passed' : 'Follow check failed',
       status: isFollowing ? 'follow_passed' : 'follow_failed',
     });
-    return isFollowing;
+    return isFollowing ? 'yes' : 'no';
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err);
     console.error(`[Meta API Error] Failed to fetch user profile:`, err);
@@ -166,10 +167,10 @@ async function checkFollowStatus(
       contact_id: contactId,
       automation_id: automationId,
       direction: 'out',
-      content: `Follow check passed (failed open on exception: ${errorMsg})`,
-      status: 'follow_passed',
+      content: `Follow status unknown (exception: ${errorMsg})`,
+      status: 'follow_unknown',
     });
-    return true; // Fail open
+    return 'unknown';
   }
 }
 
@@ -386,7 +387,7 @@ export async function handleCommentTrigger(
         automation.id
       );
 
-      if (isAlreadyFollowing) {
+      if (isAlreadyFollowing === 'yes') {
         // Already a follower — skip the gate and send the link directly
         console.log(`[Instagram Trigger] User is already following. Sending final message directly.`);
         const finalMsg = await buildFinalMessage(automation);
@@ -605,7 +606,7 @@ export async function handleMessageEvent(
       pendingFollowStates[0].automations!.id
     );
 
-    if (isFollowingNow) {
+    if (isFollowingNow !== 'no') {
       // User is following — deliver every pending automation's link in sequence
       console.log(`[Instagram Webhook DM] User is following. Sending links for ${pendingFollowStates.length} automation(s).`);
       for (const state of pendingFollowStates) {
