@@ -1,5 +1,6 @@
-import { encrypt, decrypt } from '@/lib/crypto';
+import { decrypt } from '@/lib/crypto';
 import { supabase } from '@/lib/supabase';
+import { GRAPH_BASE, saveConnectedAccount } from '@/lib/graph';
 
 interface InstagramComment {
   id: string;
@@ -117,7 +118,7 @@ async function checkFollowStatus(
   try {
     console.log(`[Meta API] Checking follow status for IGSID: ${senderId}`);
     const profileRes = await fetchWithBackoff(
-      `https://graph.instagram.com/v21.0/${senderId}?fields=follows_business&access_token=${accessToken}`,
+      `${GRAPH_BASE}/${senderId}?fields=is_user_follow_business&access_token=${accessToken}`,
       { method: 'GET' }
     );
     const profileData = await profileRes.json();
@@ -134,7 +135,8 @@ async function checkFollowStatus(
       return true; // Fail open
     }
 
-    if (profileData.follows_business === undefined) {
+    const followsBusiness = profileData.is_user_follow_business ?? profileData.follows_business;
+    if (followsBusiness === undefined) {
       console.warn(
         `[Meta API Warning] 'follows_business' field is missing or unavailable. Meta may have deprecated it or client permissions are insufficient. Defaulting to 'true' (fail open).`
       );
@@ -148,7 +150,7 @@ async function checkFollowStatus(
       return true; // Fail open
     }
 
-    const isFollowing = !!profileData.follows_business;
+    const isFollowing = !!followsBusiness;
     await supabase.from('message_log').insert({
       contact_id: contactId,
       automation_id: automationId,
@@ -211,7 +213,7 @@ async function sendOrQueueReply(
     }
 
     const dmRes = await fetchWithBackoff(
-      `https://graph.instagram.com/v21.0/${account.ig_user_id}/messages`,
+      `${GRAPH_BASE}/${account.ig_user_id}/messages`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -297,7 +299,7 @@ export async function handleCommentTrigger(
       console.log(`[Meta API] Posting public reply variant: "${randomReply}" to comment ${comment.id}`);
       
       const replyRes = await fetchWithBackoff(
-        `https://graph.instagram.com/v21.0/${comment.id}/replies`,
+        `${GRAPH_BASE}/${comment.id}/replies`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -544,7 +546,7 @@ export async function handleMessageEvent(
       }
 
       const dmRes = await fetchWithBackoff(
-        `https://graph.instagram.com/v21.0/${account.ig_user_id}/messages`,
+        `${GRAPH_BASE}/${account.ig_user_id}/messages`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -655,67 +657,21 @@ export async function initializeAccountIfNeeded(): Promise<{ success: boolean; e
       return { success: true };
     }
 
-    // No account row exists, let's auto-connect using env variables
+    // Optional: auto-connect from a token pasted into env (Unified login SYSTEM_USER token).
     const token = process.env.META_INITIAL_ACCESS_TOKEN;
-    const appId = process.env.META_APP_ID;
-    const appSecret = process.env.META_APP_SECRET;
-
-    if (!token || !appId || !appSecret) {
+    if (!token) {
       return {
         success: false,
-        error: 'Missing required environment variables: META_INITIAL_ACCESS_TOKEN, META_APP_ID, or META_APP_SECRET.',
+        error: 'No Instagram account connected yet. Open Settings and click "Connect Instagram".',
       };
     }
 
-    // Call GET https://graph.instagram.com/v21.0/me?fields=id,username&access_token=...
-    console.log('[Auto-Init] Verifying Instagram access token with graph.instagram.com/v21.0/me...');
-    const meRes = await fetch(
-      `https://graph.instagram.com/v21.0/me?fields=id,username&access_token=${token}`
-    );
-    const meData = await meRes.json();
-
-    if (meData.error) {
-      return {
-        success: false,
-        error: `Instagram API Error: ${meData.error.message}`,
-      };
-    }
-
-    const igUserId = meData.id;
-    const igUsername = meData.username;
-
-    if (!igUserId || !igUsername) {
-      return {
-        success: false,
-        error: 'Instagram verification response was missing user id or username.',
-      };
-    }
-
-    // Encrypt credentials
-    const encryptedToken = encrypt(token);
-    const encryptedSecret = encrypt(appSecret);
-
-    // Save account row to database
-    const { error: insertError } = await supabase.from('accounts').insert({
-      ig_user_id: igUserId,
-      ig_username: igUsername,
-      encrypted_access_token: encryptedToken,
-      app_id: appId,
-      encrypted_app_secret: encryptedSecret,
-    });
-
-    if (insertError) {
-      return {
-        success: false,
-        error: `Failed to insert account into database: ${insertError.message}`,
-      };
-    }
-
-    console.log(`[Auto-Init] Successfully connected Instagram account: @${igUsername}`);
+    const { username } = await saveConnectedAccount(token);
+    console.log(`[Auto-Init] Connected Instagram account from env token: @${username}`);
     return { success: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[Auto-Init Exception] Failed to initialize Instagram account:', err);
-    return { success: false, error: `Initialization Exception: ${msg}` };
+    return { success: false, error: `Initialization failed: ${msg}` };
   }
 }

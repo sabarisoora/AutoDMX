@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import { decrypt } from '@/lib/crypto';
 import { initializeAccountIfNeeded } from '@/lib/instagram';
+import { GRAPH_BASE } from '@/lib/graph';
 import DashboardGrid from './DashboardGrid';
 import { AppShell } from '../_components/AppShell';
 import { AlertCircle, RefreshCw, KeyRound } from 'lucide-react';
@@ -27,7 +28,7 @@ function getInstagramSyncMessage(apiError: string) {
     return {
       title: 'Instagram token needs refresh',
       body:
-        'The saved Instagram access token is no longer valid. Generate a new long-lived token, update .env.local, then refresh it from Settings.',
+        'The saved Meta access token is no longer valid. Open Settings and click Connect Instagram again.',
       action: 'Open settings',
     };
   }
@@ -83,22 +84,13 @@ export default async function Dashboard({
                 Instagram connection failed
               </h3>
               <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">{initError}</p>
-              <p className="mt-4 text-xs leading-relaxed text-neutral-500 dark:text-neutral-500">
-                Please configure{' '}
-                <code className="rounded bg-neutral-200/80 px-1.5 py-0.5 font-mono text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200">
-                  META_INITIAL_ACCESS_TOKEN
-                </code>
-                ,{' '}
-                <code className="rounded bg-neutral-200/80 px-1.5 py-0.5 font-mono text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200">
-                  META_APP_ID
-                </code>
-                , and{' '}
-                <code className="rounded bg-neutral-200/80 px-1.5 py-0.5 font-mono text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200">
-                  META_APP_SECRET
-                </code>{' '}
-                in <code className="font-mono text-neutral-700 dark:text-neutral-300">.env.local</code>{' '}
-                and reload the dashboard.
-              </p>
+              <Link
+                href="/api/meta/connect"
+                prefetch={false}
+                className="btn-primary mt-6 inline-flex px-5 py-2.5 text-sm"
+              >
+                Connect Instagram
+              </Link>
             </div>
           ) : (
             <div className="flex flex-col items-center">
@@ -164,7 +156,7 @@ export default async function Dashboard({
 
   try {
     const mediaRes = await fetch(
-      `https://graph.instagram.com/v21.0/${activeAccount.ig_user_id}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=24&access_token=${decryptedToken}`,
+      `${GRAPH_BASE}/${activeAccount.ig_user_id}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=24&access_token=${decryptedToken}`,
       { cache: 'no-store' }
     );
     const mediaData = await mediaRes.json();

@@ -59,9 +59,18 @@ export default async function SettingsPage({
                   Meta tokens are encrypted with AES-256-GCM at rest in Supabase.
                 </p>
               </div>
+              <div className="flex items-center gap-2">
+              <Link
+                href="/api/meta/connect"
+                prefetch={false}
+                className="btn-primary px-4 py-2 text-xs"
+              >
+                Connect Instagram
+              </Link>
               <span className="rounded-full border border-neutral-200 bg-neutral-100 px-2.5 py-0.5 text-[10px] font-mono font-medium text-neutral-700 uppercase dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-300">
                 {accounts?.length ?? 0} active
               </span>
+              </div>
             </header>
 
             {!accounts || accounts.length === 0 ? (
@@ -141,16 +150,16 @@ export default async function SettingsPage({
               </h2>
               <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
                 Configure these in <code className="font-mono text-neutral-800 dark:text-neutral-200">.env.local</code>{' '}
-                and use Refresh token above to update the encrypted value in Supabase.
+                then click Connect Instagram above. The token is stored encrypted in Supabase.
               </p>
             </header>
             <div className="grid gap-3 p-5 sm:grid-cols-3">
               {[
                 { name: 'META_APP_ID', desc: 'Your Meta app ID' },
-                { name: 'META_APP_SECRET', desc: 'Your Meta app secret' },
+                { name: 'META_APP_SECRET', desc: 'Your Meta app secret (App settings > Basic)' },
                 {
-                  name: 'META_INITIAL_ACCESS_TOKEN',
-                  desc: 'A long-lived user token',
+                  name: 'META_CONFIG_ID',
+                  desc: 'Facebook Login for Business configuration ID',
                 },
               ].map((v) => (
                 <div
