@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { decrypt } from '@/lib/crypto';
-import { GRAPH_BASE } from '@/lib/graph';
+import { HOURLY_DM_LIMIT, GRAPH_BASE } from '@/lib/graph';
 
 interface QueueItem {
   id: string;
@@ -85,13 +85,14 @@ async function handleCron(request: NextRequest) {
     const accountId = item.account_id;
 
     try {
-      // 1. Resolve and cache the account's current hourly send count to respect the 200 limit
+      // 1. Resolve and cache the account's current hourly send count to respect the hourly limit
       if (accountSendCounts[accountId] === undefined) {
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
         const { count, error: countError } = await supabase
           .from('message_log')
           .select('id, contacts!inner(account_id)', { count: 'exact', head: true })
           .eq('direction', 'out')
+          .eq('status', 'sent')
           .eq('contacts.account_id', accountId)
           .gt('created_at', oneHourAgo);
 
@@ -104,8 +105,8 @@ async function handleCron(request: NextRequest) {
       }
 
       const currentSends = accountSendCounts[accountId];
-      if (currentSends >= 200) {
-        console.warn(`[Cron Drain] Hourly send limit of 200 reached for account ${accountId}. Skipping item ${item.id}.`);
+      if (currentSends >= HOURLY_DM_LIMIT) {
+        console.warn(`[Cron Drain] Hourly send limit of ${HOURLY_DM_LIMIT} reached for account ${accountId}. Skipping item ${item.id}.`);
         results.push({ id: item.id, status: 'skipped_hourly_limit_reached' });
         continue;
       }

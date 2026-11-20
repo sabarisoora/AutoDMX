@@ -9,6 +9,9 @@ import { supabase } from '@/lib/supabase';
  * (not graph.instagram.com, which only accepts Instagram Login tokens).
  */
 export const GRAPH_VERSION = process.env.META_GRAPH_VERSION || 'v25.0';
+/** Max private-reply DMs per account per hour (Meta allows ~750). Extra ones are queued. */
+export const HOURLY_DM_LIMIT = Number(process.env.HOURLY_DM_LIMIT) || 700;
+
 export const GRAPH_BASE = `https://graph.facebook.com/${GRAPH_VERSION}`;
 
 type GraphError = { message?: string; code?: number; error_subcode?: number };

@@ -1,6 +1,6 @@
 import { decrypt } from '@/lib/crypto';
 import { supabase } from '@/lib/supabase';
-import { GRAPH_BASE, saveConnectedAccount } from '@/lib/graph';
+import { HOURLY_DM_LIMIT, GRAPH_BASE, saveConnectedAccount } from '@/lib/graph';
 
 interface InstagramComment {
   id: string;
@@ -191,11 +191,12 @@ async function sendOrQueueReply(
     .from('message_log')
     .select('id, contacts!inner(account_id)', { count: 'exact', head: true })
     .eq('direction', 'out')
+    .eq('status', 'sent')
     .eq('contacts.account_id', account.id)
     .gt('created_at', oneHourAgo);
   
   const currentHourSends = count || 0;
-  const isRateLimitExceeded = currentHourSends >= 200;
+  const isRateLimitExceeded = currentHourSends >= HOURLY_DM_LIMIT;
 
   if (!isRateLimitExceeded) {
     console.log(`[Meta API] Sending private reply for comment ${comment.id}`);
@@ -242,7 +243,7 @@ async function sendOrQueueReply(
       });
     }
   } else {
-    console.log(`[Send Queue] Rate limit of 200 reached. Queueing message for comment ${comment.id}`);
+    console.log(`[Send Queue] Rate limit of ${HOURLY_DM_LIMIT} reached. Queueing message for comment ${comment.id}`);
     await supabase.from('send_queue').insert({
       account_id: account.id,
       contact_id: contactId,
