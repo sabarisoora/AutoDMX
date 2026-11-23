@@ -12,7 +12,7 @@ export type AppShellProps = {
   /** When true, renders the marketing nav (Home). When false, renders the dashboard nav. */
   variant: "marketing" | "dashboard";
   /** Active route for the dashboard variant. */
-  activeNav?: "dashboard" | "contacts" | "analytics" | "scheduler" | "settings";
+  activeNav?: "dashboard" | "contacts" | "analytics" | "settings";
   /** Status pill text shown on the dashboard variant. */
   statusText?: string;
   /** Optional CTA button in the top right (e.g. "Launch Dashboard" on home). */
@@ -26,7 +26,6 @@ const dashboardNav: NavItem[] = [
   { label: "Overview", href: "/dashboard" },
   { label: "Contacts", href: "/dashboard/contacts" },
   { label: "Analytics", href: "/dashboard/analytics" },
-  { label: "Scheduler", href: "/dashboard/scheduler" },
   { label: "Settings", href: "/dashboard/settings" },
 ];
 
